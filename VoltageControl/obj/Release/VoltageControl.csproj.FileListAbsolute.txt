@@ -1,0 +1,13 @@
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\bin\Release\VoltageControl.exe
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\bin\Release\VoltageControl.pdb
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\Release\VoltageControl.MainWindow.resources
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\Release\VoltageControl.Properties.Resources.resources
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\Release\VoltageControl.csproj.GenerateResource.Cache
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\Release\VoltageControl.csproj.CoreCompileInputs.cache
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\Release\VoltageControl.exe
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\Release\VoltageControl.pdb
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\bin\Release\VoltageControl.exe.manifest
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\bin\Release\VoltageControl.application
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\Release\VoltageControl.exe.manifest
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\Release\VoltageControl.application
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\Release\VoltageControl.csprojResolveAssemblyReference.cache

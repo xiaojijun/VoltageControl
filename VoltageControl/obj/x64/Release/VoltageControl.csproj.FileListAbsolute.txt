@@ -1,0 +1,10 @@
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\bin\x64\Release\VoltageControl.exe.manifest
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\bin\x64\Release\VoltageControl.application
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\bin\x64\Release\VoltageControl.exe
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\x64\Release\VoltageControl.MainWindow.resources
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\x64\Release\VoltageControl.Properties.Resources.resources
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\x64\Release\VoltageControl.csproj.GenerateResource.Cache
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\x64\Release\VoltageControl.csproj.CoreCompileInputs.cache
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\x64\Release\VoltageControl.exe.manifest
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\x64\Release\VoltageControl.application
+C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\x64\Release\VoltageControl.exe
