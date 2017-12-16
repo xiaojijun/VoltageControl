@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="VoltageControl.exe" size="105352">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="VoltageControl.exe" size="108936">
       <assemblyIdentity name="VoltageControl" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>MB4ZCL18BgNlT5v9bHsk1oqn4to=</dsig:DigestValue>
+        <dsig:DigestValue>UXXEDqhh/hyvwFGwzkzeSslowbo=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
