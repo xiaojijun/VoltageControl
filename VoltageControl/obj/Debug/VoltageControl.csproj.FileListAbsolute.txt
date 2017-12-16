@@ -15,7 +15,6 @@ F:\proj\VoltageControl\VoltageControl\bin\Debug\VoltageControl.exe.manifest
 F:\proj\VoltageControl\VoltageControl\bin\Debug\VoltageControl.application
 F:\proj\VoltageControl\VoltageControl\bin\Debug\VoltageControl.exe
 F:\proj\VoltageControl\VoltageControl\bin\Debug\VoltageControl.pdb
-F:\proj\VoltageControl\VoltageControl\obj\Debug\VoltageControl.csprojResolveAssemblyReference.cache
 F:\proj\VoltageControl\VoltageControl\obj\Debug\VoltageControl.MainWindow.resources
 F:\proj\VoltageControl\VoltageControl\obj\Debug\VoltageControl.Properties.Resources.resources
 F:\proj\VoltageControl\VoltageControl\obj\Debug\VoltageControl.csproj.GenerateResource.Cache
@@ -24,3 +23,5 @@ F:\proj\VoltageControl\VoltageControl\obj\Debug\VoltageControl.exe.manifest
 F:\proj\VoltageControl\VoltageControl\obj\Debug\VoltageControl.application
 F:\proj\VoltageControl\VoltageControl\obj\Debug\VoltageControl.exe
 F:\proj\VoltageControl\VoltageControl\obj\Debug\VoltageControl.pdb
+F:\proj\VoltageControl\VoltageControl\obj\Debug\VoltageControl.src.MultiSendConfirmDiag.resources
+F:\proj\VoltageControl\VoltageControl\obj\Debug\VoltageControl.src.AboutBox1.resources

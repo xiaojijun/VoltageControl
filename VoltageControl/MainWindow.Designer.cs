@@ -35,7 +35,6 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.button_CleanLog = new System.Windows.Forms.Button();
             this.button_serialsetting = new System.Windows.Forms.Button();
             this.comboBox_checkbits = new System.Windows.Forms.ComboBox();
@@ -58,6 +57,15 @@
             this.voltage = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.status = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.operation = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.关于本软件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SelectAllMemu = new System.Windows.Forms.ToolStripMenuItem();
+            this.合并发送ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.重置列表ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.设置发送间隔ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.delay_time = new System.Windows.Forms.ToolStripTextBox();
+            this.SetDelayTime = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             this.panel4.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -65,6 +73,7 @@
             this.groupBox2.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_channel)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -94,7 +103,6 @@
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox3.Controls.Add(this.button1);
             this.groupBox3.Controls.Add(this.button_CleanLog);
             this.groupBox3.Controls.Add(this.button_serialsetting);
             this.groupBox3.Controls.Add(this.comboBox_checkbits);
@@ -114,16 +122,6 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "串口";
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(0, 208);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(87, 23);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "重置通道列表";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // button_CleanLog
             // 
             this.button_CleanLog.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
@@ -131,7 +129,7 @@
             this.button_CleanLog.Name = "button_CleanLog";
             this.button_CleanLog.Size = new System.Drawing.Size(75, 23);
             this.button_CleanLog.TabIndex = 1;
-            this.button_CleanLog.Text = "清空log";
+            this.button_CleanLog.Text = "清空终端输出";
             this.button_CleanLog.UseVisualStyleBackColor = true;
             this.button_CleanLog.Click += new System.EventHandler(this.button_CleanLog_Click);
             // 
@@ -143,7 +141,7 @@
             this.button_serialsetting.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
             this.button_serialsetting.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
             this.button_serialsetting.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button_serialsetting.Location = new System.Drawing.Point(185, 50);
+            this.button_serialsetting.Location = new System.Drawing.Point(35, 49);
             this.button_serialsetting.Name = "button_serialsetting";
             this.button_serialsetting.Size = new System.Drawing.Size(120, 121);
             this.button_serialsetting.TabIndex = 4;
@@ -155,7 +153,7 @@
             // 
             this.comboBox_checkbits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_checkbits.FormattingEnabled = true;
-            this.comboBox_checkbits.Location = new System.Drawing.Point(70, 153);
+            this.comboBox_checkbits.Location = new System.Drawing.Point(225, 150);
             this.comboBox_checkbits.Name = "comboBox_checkbits";
             this.comboBox_checkbits.Size = new System.Drawing.Size(97, 20);
             this.comboBox_checkbits.TabIndex = 3;
@@ -163,7 +161,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(23, 156);
+            this.label5.Location = new System.Drawing.Point(178, 153);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(41, 12);
             this.label5.TabIndex = 2;
@@ -173,7 +171,7 @@
             // 
             this.comboBox_stopbits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_stopbits.FormattingEnabled = true;
-            this.comboBox_stopbits.Location = new System.Drawing.Point(70, 127);
+            this.comboBox_stopbits.Location = new System.Drawing.Point(225, 124);
             this.comboBox_stopbits.Name = "comboBox_stopbits";
             this.comboBox_stopbits.Size = new System.Drawing.Size(97, 20);
             this.comboBox_stopbits.TabIndex = 3;
@@ -181,7 +179,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(23, 130);
+            this.label4.Location = new System.Drawing.Point(178, 127);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(41, 12);
             this.label4.TabIndex = 2;
@@ -191,7 +189,7 @@
             // 
             this.comboBox_databits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_databits.FormattingEnabled = true;
-            this.comboBox_databits.Location = new System.Drawing.Point(70, 101);
+            this.comboBox_databits.Location = new System.Drawing.Point(225, 98);
             this.comboBox_databits.Name = "comboBox_databits";
             this.comboBox_databits.Size = new System.Drawing.Size(97, 20);
             this.comboBox_databits.TabIndex = 3;
@@ -199,7 +197,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(23, 104);
+            this.label3.Location = new System.Drawing.Point(178, 101);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(41, 12);
             this.label3.TabIndex = 2;
@@ -209,7 +207,7 @@
             // 
             this.comboBox_baudrate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_baudrate.FormattingEnabled = true;
-            this.comboBox_baudrate.Location = new System.Drawing.Point(70, 75);
+            this.comboBox_baudrate.Location = new System.Drawing.Point(225, 72);
             this.comboBox_baudrate.Name = "comboBox_baudrate";
             this.comboBox_baudrate.Size = new System.Drawing.Size(97, 20);
             this.comboBox_baudrate.TabIndex = 3;
@@ -217,7 +215,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(23, 78);
+            this.label2.Location = new System.Drawing.Point(178, 75);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(41, 12);
             this.label2.TabIndex = 2;
@@ -227,7 +225,7 @@
             // 
             this.comboBox_com.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_com.FormattingEnabled = true;
-            this.comboBox_com.Location = new System.Drawing.Point(70, 49);
+            this.comboBox_com.Location = new System.Drawing.Point(225, 46);
             this.comboBox_com.Name = "comboBox_com";
             this.comboBox_com.Size = new System.Drawing.Size(97, 20);
             this.comboBox_com.TabIndex = 1;
@@ -236,7 +234,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(35, 52);
+            this.label1.Location = new System.Drawing.Point(190, 49);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(29, 12);
             this.label1.TabIndex = 0;
@@ -283,6 +281,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel2.Controls.Add(this.dataGridView_channel);
+            this.panel2.Controls.Add(this.menuStrip1);
             this.panel2.Location = new System.Drawing.Point(0, 3);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(545, 494);
@@ -302,13 +301,13 @@
             this.voltage,
             this.status,
             this.operation});
-            this.dataGridView_channel.Location = new System.Drawing.Point(0, 0);
+            this.dataGridView_channel.Location = new System.Drawing.Point(0, 27);
             this.dataGridView_channel.Name = "dataGridView_channel";
             this.dataGridView_channel.RowHeadersVisible = false;
             this.dataGridView_channel.RowTemplate.Height = 23;
-            this.dataGridView_channel.Size = new System.Drawing.Size(548, 498);
+            this.dataGridView_channel.Size = new System.Drawing.Size(548, 471);
             this.dataGridView_channel.TabIndex = 0;
-            this.dataGridView_channel.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.Datagridview_button_click);
+            this.dataGridView_channel.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SendSingleChannel_button_click);
             this.dataGridView_channel.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.CellEndEdit_FormatNumber);
             this.dataGridView_channel.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.CellValidating);
             // 
@@ -358,14 +357,91 @@
             this.operation.HeaderText = "操作";
             this.operation.Name = "operation";
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.文件ToolStripMenuItem,
+            this.SelectAllMemu,
+            this.合并发送ToolStripMenuItem,
+            this.重置列表ToolStripMenuItem,
+            this.设置发送间隔ToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(545, 25);
+            this.menuStrip1.TabIndex = 1;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // 文件ToolStripMenuItem
+            // 
+            this.文件ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.关于本软件ToolStripMenuItem});
+            this.文件ToolStripMenuItem.Name = "文件ToolStripMenuItem";
+            this.文件ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
+            this.文件ToolStripMenuItem.Text = "文件";
+            // 
+            // 关于本软件ToolStripMenuItem
+            // 
+            this.关于本软件ToolStripMenuItem.Name = "关于本软件ToolStripMenuItem";
+            this.关于本软件ToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.关于本软件ToolStripMenuItem.Text = "关于本软件";
+            this.关于本软件ToolStripMenuItem.Click += new System.EventHandler(this.ToolStripMenuItem_Click);
+            // 
+            // SelectAllMemu
+            // 
+            this.SelectAllMemu.Name = "SelectAllMemu";
+            this.SelectAllMemu.Size = new System.Drawing.Size(68, 21);
+            this.SelectAllMemu.Text = "全部选中";
+            this.SelectAllMemu.Click += new System.EventHandler(this.SelectAll_Click);
+            // 
+            // 合并发送ToolStripMenuItem
+            // 
+            this.合并发送ToolStripMenuItem.Name = "合并发送ToolStripMenuItem";
+            this.合并发送ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
+            this.合并发送ToolStripMenuItem.Text = "发送选中";
+            this.合并发送ToolStripMenuItem.Click += new System.EventHandler(this.SendMultiChannel_Click);
+            // 
+            // 重置列表ToolStripMenuItem
+            // 
+            this.重置列表ToolStripMenuItem.Name = "重置列表ToolStripMenuItem";
+            this.重置列表ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
+            this.重置列表ToolStripMenuItem.Text = "重置列表";
+            this.重置列表ToolStripMenuItem.Click += new System.EventHandler(this.ResetGridView_Click);
+            // 
+            // 设置发送间隔ToolStripMenuItem
+            // 
+            this.设置发送间隔ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.delay_time,
+            this.SetDelayTime});
+            this.设置发送间隔ToolStripMenuItem.Name = "设置发送间隔ToolStripMenuItem";
+            this.设置发送间隔ToolStripMenuItem.Size = new System.Drawing.Size(92, 21);
+            this.设置发送间隔ToolStripMenuItem.Text = "设置发送间隔";
+            // 
+            // delay_time
+            // 
+            this.delay_time.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.delay_time.MaxLength = 5;
+            this.delay_time.Name = "delay_time";
+            this.delay_time.Size = new System.Drawing.Size(100, 23);
+            this.delay_time.Text = "300";
+            this.delay_time.ToolTipText = "毫秒";
+            // 
+            // SetDelayTime
+            // 
+            this.SetDelayTime.Name = "SetDelayTime";
+            this.SetDelayTime.Size = new System.Drawing.Size(160, 22);
+            this.SetDelayTime.Text = "设置（毫秒）";
+            this.SetDelayTime.Click += new System.EventHandler(this.SetDelayTime_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(923, 498);
             this.Controls.Add(this.panel1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainWindow";
             this.Text = "电压输出调节器";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormClosing_DeleteSource);
             this.Resize += new System.EventHandler(this.MainWindow_load);
             this.panel1.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
@@ -374,7 +450,10 @@
             this.panel3.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_channel)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -401,12 +480,20 @@
         private System.Windows.Forms.RichTextBox terminator;
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Button button_CleanLog;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Selected;
         private System.Windows.Forms.DataGridViewTextBoxColumn channel;
         private System.Windows.Forms.DataGridViewTextBoxColumn voltage;
         private System.Windows.Forms.DataGridViewTextBoxColumn status;
         private System.Windows.Forms.DataGridViewButtonColumn operation;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem 合并发送ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 重置列表ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 文件ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem SelectAllMemu;
+        private System.Windows.Forms.ToolStripMenuItem 关于本软件ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 设置发送间隔ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripTextBox delay_time;
+        private System.Windows.Forms.ToolStripMenuItem SetDelayTime;
     }
 }
 

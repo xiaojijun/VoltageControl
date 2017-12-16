@@ -10,6 +10,8 @@ using System.IO.Ports;
 using System.Text.RegularExpressions;
 using VoltageControl.src;
 using System.Collections;
+using System.Threading;
+using VoltageControl.CommonDEF;
 
 namespace VoltageControl
 {
@@ -18,30 +20,50 @@ namespace VoltageControl
 
     public partial class MainWindow : Form
     {
-        int ONE_FRAME_BYTES_WITH_ONE_PRE_BYTES = 10; // (FE) FE 68H CHANNEL CONTROL DATA*4 CS STOP
-        int ONE_FRAME_BYTES_WITH_TWO_PRE_BYTES = 11; // FE FE 68H CHANNEL CONTROL DATA*4 CS STOP
-        //int EFFECT_DATA_BYTES = 6;
+
+
+        public int ONE_FRAME_BYTES_WITH_ONE_PRE_BYTES = 10; // (FE) FE 68H CHANNEL CONTROL DATA*4 CS STOP
+        public int ONE_FRAME_BYTES_WITH_TWO_PRE_BYTES = 11; // FE FE 68H CHANNEL CONTROL DATA*4 CS STOP
+
         // when cell validating set value, and when edit ending clear the value
-
-
         string strBeforeCellChangeValue = "";
 
         // pending channel 
         //private List<WaitingForConfirm> cPendingChannel = new List<WaitingForConfirm>();
 
         SerialPort cSerialPort = null;
+        private System.Timers.Timer cTimer = null;
+        // mark the timer elapesd states
+        private bool bTimerInElapesing = false;
+
+        SendChannelData cSendChannel = null;
+
+        private bool bIsInReceiving = false;
+        private bool bPrepareCloseMainWindow = false;
+
         public MainWindow()
         {
             InitializeComponent();
             InitializeSerialPort();
             FillVoltageChannel(140);
             SetTimerInterval();
+            InitalSendData();
+
+        }
+
+
+        private void InitalSendData()
+        {
+            cSendChannel = new SendChannelData();
+            cSendChannel.SetLog = new SendChannelData.OutPutMessage(WriteLog);
+            cSendChannel.SetRowSending = SetRowState;
         }
 
         // set timer interval
         private void SetTimerInterval()
         {
-            System.Timers.Timer cTimer = new System.Timers.Timer();
+            
+            cTimer = new System.Timers.Timer();
             // set interval
             cTimer.Interval = 2000;
             cTimer.Elapsed += new System.Timers.ElapsedEventHandler(TimerElaped_CheckPendingChannel);
@@ -51,11 +73,12 @@ namespace VoltageControl
 
         private void TimerElaped_CheckPendingChannel(object sender, System.Timers.ElapsedEventArgs e)
         {
+            bTimerInElapesing = true;
             List<WaitingForConfirm> cPendingChannel = WaitingForConfirmList.Instance().GetPendingChannelList();
             string str_log1 = "";
             for (int i = cPendingChannel.Count - 1; i >= 0; --i)
             {
-                if(cPendingChannel[i].CheckTimeOut())
+                if (cPendingChannel[i].CheckTimeOut())
                 {
                     // reset channel
                     ResetChannel resetChannel = new ResetChannel(RestDataGridViewRows);
@@ -74,6 +97,8 @@ namespace VoltageControl
                 terminator.Invoke(Log_delegate1, str_log1);
             }
 
+            // time elpesed end
+            bTimerInElapesing = false;
 
         }
 
@@ -81,7 +106,7 @@ namespace VoltageControl
 
         private void MainWindow_load(object ob, EventArgs e)
         {
-            for(int i = 0; i < dataGridView_channel.ColumnCount; ++i)
+            for (int i = 0; i < dataGridView_channel.ColumnCount; ++i)
             {
                 dataGridView_channel.Columns[i].Width = panel2.Width / dataGridView_channel.ColumnCount;
             }
@@ -90,6 +115,12 @@ namespace VoltageControl
         // Open serial port
         private void button_serialsetting_Click(object sender, EventArgs e)
         {
+            if(bIsInReceiving || cSendChannel.IsInSendingData())
+            {
+                MessageBox.Show("串口正在收发数据，请稍后重试！");
+                return;
+            }
+
             if ("关闭串口" == button_serialsetting.Text)
             {
                 cSerialPort.Close();
@@ -104,7 +135,7 @@ namespace VoltageControl
                 comboBox_databits.Enabled = true;
                 comboBox_stopbits.Enabled = true;
 
-                
+
                 return;
             }
 
@@ -173,12 +204,12 @@ namespace VoltageControl
                     comboBox_databits.Enabled = false;
                     comboBox_stopbits.Enabled = false;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                     cSerialPort = null;
                 }
-                
+
             }
         }
 
@@ -252,14 +283,18 @@ namespace VoltageControl
 
         private void FillVoltageChannel(Int32 iChannelCount)
         {
-            for(int i = 0; i < iChannelCount; ++i)
+            for (int i = 0; i < iChannelCount; ++i)
             {
                 int iRowIndex = dataGridView_channel.Rows.Add();
 
                 dataGridView_channel.Rows[iRowIndex].Height = 35;
 
+                // checkbox
+                dataGridView_channel.Rows[iRowIndex].Cells[0].Value = "False";
+
                 // channel
                 dataGridView_channel.Rows[iRowIndex].Cells[1].Value = iRowIndex + 1;
+
                 // voltage
                 dataGridView_channel.Rows[iRowIndex].Cells[2].Value = 0.00.ToString("F2");
 
@@ -280,6 +315,11 @@ namespace VoltageControl
         private List<byte> receivebuff = new List<byte>(256);
         private void Serial_ReceiveData(object Sender, SerialDataReceivedEventArgs Event)
         {
+            if (bPrepareCloseMainWindow)
+            {
+                return;
+            }
+            bIsInReceiving = true;
             int iDataByteToRead = cSerialPort.BytesToRead;
             byte[] readbuff = new byte[iDataByteToRead];
             int iActReadBytes = cSerialPort.Read(readbuff, 0, iDataByteToRead);
@@ -287,23 +327,23 @@ namespace VoltageControl
             //int iOneFrameByte = 8;
             byte STOP_BYTE = 0x16;
             int STOP_BYTE_index = ONE_FRAME_BYTES_WITH_ONE_PRE_BYTES - 1; // 已经考虑了一个前导符
-            int iCS_Byte_Index = STOP_BYTE_index - 1; 
+            int iCS_Byte_Index = STOP_BYTE_index - 1;
             while (receivebuff.Count >= ONE_FRAME_BYTES_WITH_ONE_PRE_BYTES) // (FE) FE 68H CHANNEL CONTROL DATA*4 CS STOP
             {
                 // Check data effect
                 int iStartIndex = 0; // find the start byte with 0xFE 0x68H
                 bool bFindStart = false;
-                for (int i = 0; i + 1 < receivebuff.Count ; ++i)
+                for (int i = 0; i + 1 < receivebuff.Count; ++i)
                 {
                     // find start index
-                    if(0xFE == receivebuff[i] && 0x68 == receivebuff[i+1])
+                    if (0xFE == receivebuff[i] && 0x68 == receivebuff[i + 1])
                     {
                         iStartIndex = i; // FE 68 的位置
                         bFindStart = true;
                         break;
                     }
                 }
-                
+
                 if (bFindStart)
                 {
                     receivebuff.RemoveRange(0, iStartIndex); // 0: FE, 1:68H
@@ -328,7 +368,7 @@ namespace VoltageControl
                         // write log
                         byte[] byte_log2 = new byte[ONE_FRAME_BYTES_WITH_ONE_PRE_BYTES];
                         receivebuff.CopyTo(0, byte_log2, 0, ONE_FRAME_BYTES_WITH_ONE_PRE_BYTES);
-                        string str_log2 = "和校验失败【应为0x" + byCS.ToString("X2") +  "】，或停止位【应为0x" + STOP_BYTE.ToString("X2") + "】错误，丢弃！ 接收数据：\r\n" + ChangeArrayToHexString(byte_log2) + "\r\n\r\n";
+                        string str_log2 = "和校验失败【应为0x" + byCS.ToString("X2") + "】，或停止位【应为0x" + STOP_BYTE.ToString("X2") + "】错误，丢弃！ 接收数据：\r\n" + ChangeArrayToHexString(byte_log2) + "\r\n\r\n";
                         WriteTerminatorLog Log_delegate2 = new WriteTerminatorLog(WriteLog);
                         terminator.Invoke(Log_delegate2, str_log2);
 
@@ -389,7 +429,7 @@ namespace VoltageControl
                         }
                     }
 
-                    if(!bFindPendingChannel)
+                    if (!bFindPendingChannel)
                     {
                         str_log += "通道【" + channel.ToString() + "】-> 数据无效，可能原因为：数据返回超时！\r\n\r\n";
                     }
@@ -404,7 +444,7 @@ namespace VoltageControl
                     receivebuff.RemoveRange(0, receivebuff.Count - 1); // leave last byte data 
                 }
             }
-
+            bIsInReceiving = false;
         }
 
 
@@ -421,7 +461,7 @@ namespace VoltageControl
 
                 // the string length must less than  6
 
-                if(6 < str_text.Trim().Length)
+                if (6 < str_text.Trim().Length)
                 {
                     MessageBox.Show("请输入不要超过6个字符！");
                     e.Cancel = true;
@@ -465,7 +505,7 @@ namespace VoltageControl
             }
         }
 
-        private void Datagridview_button_click(object ob, DataGridViewCellEventArgs e)
+        private void SendSingleChannel_button_click(object ob, DataGridViewCellEventArgs e)
         {
             if ("operation" == dataGridView_channel.Columns[e.ColumnIndex].Name)
             {
@@ -479,7 +519,7 @@ namespace VoltageControl
                 {
                     List<WaitingForConfirm> cPendingChannel = WaitingForConfirmList.Instance().GetPendingChannelList();
                     // check channel state, if the channel is waiting for respone, not send data 
-                    for(int i = 0; i < cPendingChannel.Count; ++i)
+                    for (int i = 0; i < cPendingChannel.Count; ++i)
                     {
                         // row index + 1 is the channel number
                         if ((byte)(e.RowIndex + 1) == cPendingChannel[i].Getchannel())
@@ -491,99 +531,30 @@ namespace VoltageControl
                     }
 
                     string sender_data = dataGridView_channel.Rows[e.RowIndex].Cells[2].Value.ToString();
-                    float fUserIn = 0;
-                    if (!float.TryParse(sender_data, out fUserIn))
+                    List<RowInfo> SendList = new List<RowInfo>();
+                    RowInfo rowInfo = new RowInfo();
+                    rowInfo.iRowIndex = e.RowIndex;
+                    rowInfo.strUserPutIn = sender_data;
+                    SendList.Add(rowInfo);
+
+                    if (!cSendChannel.InitialMultiRows(cSerialPort, SendList))
                     {
-                        MessageBox.Show("发送失败：输入电压不正确！");
+                        MessageBox.Show("发送串口忙，请稍后重试！");
                         return;
                     }
-                    byte[] senderbuff = new byte[ONE_FRAME_BYTES_WITH_TWO_PRE_BYTES];
-                    senderbuff[0] = 0xFE;
-                    senderbuff[1] = 0xFE;
-                    senderbuff[2] = 0x68; // start byte
+                    Thread SendingThread = new Thread(cSendChannel.SendMultiRows);
+                    SendingThread.Start();
 
-                    // channal  
-                    senderbuff[3] = Convert.ToByte(dataGridView_channel.Rows[e.RowIndex].Cells[1].Value);
-
-                    // control byte
-                    // bit7:0b  data from computer to meu
-                    // bit6 bit5: 00b set voltage
-                    byte byControl = 0;
-                    senderbuff[4] = byControl;
-
-
-                    // DATA
-                    Byte data_integer = Convert.ToByte(fUserIn);
-                    senderbuff[5] = data_integer;
-                    float data_decimal = (fUserIn - (float)data_integer);
-                    int data_decimal_to_int = (int)(data_decimal * 0xFFFFFF);
-
-                    senderbuff[6] = (Byte)((data_decimal_to_int & 0xFF0000) >> 16);
-                    senderbuff[7] = (Byte)((data_decimal_to_int & 0x00FF00) >> 8);
-                    senderbuff[8] = (Byte)((data_decimal_to_int & 0x0000FF));
-
-                    // CS
-                    byte byCS = 0;
-                    for (int i = 2; i <= ONE_FRAME_BYTES_WITH_TWO_PRE_BYTES - 2 - 1; ++i)
-                    {
-                        byCS += senderbuff[i];
-                    }
-                    senderbuff[9] = byCS;
-
-                    // stop
-                    senderbuff[10] = 0x16;
-
-
-                    //cSerialPort.Write(senderbuff, 0, ONE_FRAME_BYTES_WITH_TWO_PRE_BYTES);
-
-                    // set pending channel
-                    byte[] VoltageByte = new byte[4];
-                    VoltageByte[0] = senderbuff[5];
-                    VoltageByte[1] = senderbuff[6];
-                    VoltageByte[2] = senderbuff[7];
-                    VoltageByte[3] = senderbuff[8];
-                    WaitingForConfirm cSendingChannel = new WaitingForConfirm(senderbuff[3], VoltageByte);
-                    // add the pending channel to list
-                    //cPendingChannel.Add(cSendingChannel);
-                    WaitingForConfirmList.Instance().AddPendingChannel(cSendingChannel);
-
-                    // set row style
-                    // check box select
-                    dataGridView_channel.Rows[e.RowIndex].Cells[0].Value = true;
-                    // read only
-                    dataGridView_channel.Rows[e.RowIndex].ReadOnly = true;
-                    // background color
-                    dataGridView_channel.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Gray;
-                    // channnel state
-                    dataGridView_channel.Rows[e.RowIndex].Cells[3].Value = "已发送，等待状态返回……";
-
-                    // set log
-                    terminator.AppendText(DateTime.Now.ToLongTimeString() + ": 通道【" + senderbuff[3].ToString() + "】发送->  电压【" + sender_data + "】\r\n" + ChangeArrayToHexString(senderbuff) + "\r\n\r\n");
-                    //terminator.AppendText(ChangeArrayToHexString(senderbuff) + "\r\n");
-
-
-
-
-
-
-                    //test 
-                    senderbuff[4] = 0xC0;
-                    byCS = 0;
-                    for (int i = 2; i <= ONE_FRAME_BYTES_WITH_TWO_PRE_BYTES - 2 - 1; ++i)
-                    {
-                        byCS += senderbuff[i];
-                    }
-                    senderbuff[9] = byCS;
-                    cSerialPort.Write(senderbuff, 0, ONE_FRAME_BYTES_WITH_TWO_PRE_BYTES);
                 }
             }
 
         }
+        
 
         private string ChangeArrayToHexString(byte[] array)
         {
             string ret_string = "";
-            for(int i = 0; i < array.Length; ++i)
+            for (int i = 0; i < array.Length; ++i)
             {
                 ret_string += (array[i].ToString("X2") + " ");
             }
@@ -614,7 +585,7 @@ namespace VoltageControl
             }
         }
 
-        public  void RestDataGridViewRows(byte channel_num, string strState)
+        public void RestDataGridViewRows(byte channel_num, string strState)
         {
             dataGridView_channel.Rows[channel_num - 1].DefaultCellStyle.BackColor = DefaultBackColor;
             dataGridView_channel.Rows[channel_num - 1].ReadOnly = false;
@@ -631,7 +602,14 @@ namespace VoltageControl
 
         private void WriteLog(string log)
         {
-            terminator.AppendText(log);
+            if (this.terminator.InvokeRequired)
+            {
+                this.Invoke(cSendChannel.SetLog, log);
+            }
+            else
+            {
+                terminator.AppendText(log);
+            }
         }
 
         private void button_CleanLog_Click(object sender, EventArgs e)
@@ -644,10 +622,225 @@ namespace VoltageControl
             GetSeiralComList();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void ResetGridView_Click(object sender, EventArgs e)
         {
             dataGridView_channel.Rows.Clear();
             FillVoltageChannel(140);
+            SelectAllMemu.Text = "全部选中";
         }
+
+
+
+        private void SendMultiChannel_Click(object sender, EventArgs e)
+        {
+            if (null == cSerialPort || !cSerialPort.IsOpen)
+            {
+                MessageBox.Show("请先打开串口！");
+                return;
+            }
+            List<RowInfo> sendlist = new List<RowInfo>();
+            string s = "";
+            for (int row = 0; row < dataGridView_channel.Rows.Count; ++row)
+            {
+                string s1 = dataGridView_channel.Rows[row].Cells[0].EditedFormattedValue.ToString();
+                string s2 = dataGridView_channel.Rows[row].Cells[3].Value.ToString();
+                if ("True" == s1 && "已发送，等待状态返回……" != s2)
+                {
+                    RowInfo rowInfo = new RowInfo(row, dataGridView_channel.Rows[row].Cells[2].Value.ToString());
+                    sendlist.Add(rowInfo);
+                    s += "通道【" + (row + 1).ToString() + "】  电压【" + dataGridView_channel.Rows[row].Cells[2].Value.ToString() + "】\r\n";
+                }
+            }
+
+            if (0 == sendlist.Count)
+            {
+                return;
+            }
+
+
+            MultiSendConfirmDiag diag = new MultiSendConfirmDiag(s);
+            DialogResult result = diag.ShowDialog();
+            if (DialogResult.OK != result)
+            {
+                terminator.AppendText("合并发送取消！\r\n");
+                return;
+            }
+
+            // 发送串口忙
+            if(false == cSendChannel.InitialMultiRows(cSerialPort ,sendlist))
+            {
+                MessageBox.Show("串口忙，请稍后重试！");
+                return;
+            }
+            Thread SendThread = new Thread(cSendChannel.SendMultiRows);
+            SendThread.Start();
+
+        }
+
+        private void SelectAll_Click(object sender, EventArgs e)
+        {
+            // 如果checkbox是当前焦点的话，checkbox的指会被formatvalud保持，需要改变焦点
+            if (0 == dataGridView_channel.CurrentCell.ColumnIndex)
+            {
+                dataGridView_channel.CurrentCell = dataGridView_channel[1, dataGridView_channel.CurrentCell.RowIndex];
+            }
+
+            if ("全部选中" == SelectAllMemu.Text.ToString())
+            {
+                foreach (DataGridViewRow OneRow in dataGridView_channel.Rows)
+                {
+                    if ("True" != OneRow.Cells[0].Value.ToString())
+                    {
+                        OneRow.Cells[0].Value = "True";
+                    }
+                }
+                SelectAllMemu.Text = "取消全选";
+            }
+            else
+            {
+                foreach (DataGridViewRow OneRow in dataGridView_channel.Rows)
+                {
+                    if ("True" == OneRow.Cells[0].Value.ToString())
+                    {
+                        OneRow.Cells[0].Value = "False";
+                    }
+                }
+                SelectAllMemu.Text = "全部选中";
+            }
+        }
+
+
+        // 设置datagridview状态
+
+        private void SetRowState(int iRowIndex, RowState eRowState, string ThreadName)
+        {
+            if (this.dataGridView_channel.InvokeRequired)
+            {  
+                if ("ThreadSending" == ThreadName)
+                {
+                    this.dataGridView_channel.Invoke(cSendChannel.SetRowSending, iRowIndex, eRowState, ThreadName);
+                }
+
+            }
+            else
+            {
+                switch(eRowState)
+                {
+                    case RowState.ROW_STATE_NORMAL:
+                        {
+                            dataGridView_channel.Rows[iRowIndex].Cells[0].Value = false;
+                            // read only
+                            dataGridView_channel.Rows[iRowIndex].ReadOnly = false;
+                            // background color
+                            dataGridView_channel.Rows[iRowIndex].DefaultCellStyle.BackColor = DefaultBackColor;
+                            // channnel state
+                            dataGridView_channel.Rows[iRowIndex].Cells[3].Value = "正常";
+
+                        }
+                        return;
+                    case RowState.ROW_STATE_SENDING:
+                        {
+                            dataGridView_channel.Rows[iRowIndex].Cells[0].Value = true;
+                            // read only
+                            dataGridView_channel.Rows[iRowIndex].ReadOnly = true;
+                            // background color
+                            dataGridView_channel.Rows[iRowIndex].DefaultCellStyle.BackColor = Color.Gray;
+                            // channnel state
+                            dataGridView_channel.Rows[iRowIndex].Cells[3].Value = "已发送，等待状态返回……";
+
+                        }
+                        return;
+                    case RowState.ROW_STATE_TIMEOUT:
+                        {
+                            dataGridView_channel.Rows[iRowIndex].Cells[0].Value = false;
+                            // read only
+                            dataGridView_channel.Rows[iRowIndex].ReadOnly = false;
+                            // background color
+                            dataGridView_channel.Rows[iRowIndex].DefaultCellStyle.BackColor = DefaultBackColor;
+                            // channnel state
+                            dataGridView_channel.Rows[iRowIndex].Cells[3].Value = "超时：无回应！";
+
+                        }
+                        return;
+                    case RowState.ROW_STATE_SENDDONE:
+                        {
+                            dataGridView_channel.Rows[iRowIndex].Cells[0].Value = false;
+                            // read only
+                            dataGridView_channel.Rows[iRowIndex].ReadOnly = false;
+                            // background color
+                            dataGridView_channel.Rows[iRowIndex].DefaultCellStyle.BackColor = DefaultBackColor;
+                            // channnel state
+                            dataGridView_channel.Rows[iRowIndex].Cells[3].Value = "设置完成！";
+
+                        }
+                        return;
+                    default:
+                        return;
+                }
+            }
+        }
+
+
+        
+        // 主程序关闭事件
+        private void FormClosing_DeleteSource(object sender, FormClosingEventArgs e)
+        {
+            bPrepareCloseMainWindow = true;
+
+            while (bIsInReceiving || cSendChannel.IsInSendingData())
+            {
+                MessageBox.Show("串口正在收发数据，请稍后关闭！");
+                e.Cancel = true;
+                bPrepareCloseMainWindow = false;
+                return;
+            }
+
+            // stop timer
+            if (null != cTimer)
+            {
+                // waiting for timer elpesd end
+                while(!bTimerInElapesing)
+                {
+                    cTimer.Stop();
+                    break;
+                }
+            }
+
+            if (null != cSerialPort)
+            {
+                cSerialPort.Close();
+                cSerialPort.Dispose();
+            }
+        }
+
+        private void ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AboutBox1 ab = new AboutBox1();
+            ab.ShowDialog();
+        }
+
+        private void SetDelayTime_Click(object sender, EventArgs e)
+        {
+            string delay = delay_time.Text;
+            Int32 iDelayTime = 0;
+            if (int.TryParse(delay, out iDelayTime))
+            {
+                if (iDelayTime <= 10000 && iDelayTime >= 100)
+                {
+                    cSendChannel.SetDelayTime(iDelayTime);
+                    delay_time.Text = iDelayTime.ToString();
+                    return;
+                }
+                else
+                {
+
+                }
+            }
+            MessageBox.Show("请输入100 ~ 10000（0.1秒 到 10秒）时间！");
+            int iDefault = cSendChannel.GetDelayTime();
+            delay_time.Text = iDefault.ToString();
+        }
+
     }
 }
+

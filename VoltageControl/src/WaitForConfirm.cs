@@ -31,14 +31,20 @@ namespace VoltageControl.src
 
         public void AddPendingChannel(WaitingForConfirm item)
         {
-            m_PendingChannelList.Add(item);
+            lock (locker)
+            {
+                m_PendingChannelList.Add(item);
+            }
         }
 
         public void RemovePendingChannel(int iIndex)
         {
-            if (0 <= iIndex && m_PendingChannelList.Count > iIndex)
+            lock (locker)
             {
-                m_PendingChannelList.RemoveAt(iIndex);
+                if (0 <= iIndex && m_PendingChannelList.Count > iIndex)
+                {
+                    m_PendingChannelList.RemoveAt(iIndex);
+                }
             }
         }
 

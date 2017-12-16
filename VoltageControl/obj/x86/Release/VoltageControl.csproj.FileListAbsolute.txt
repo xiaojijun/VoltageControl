@@ -11,3 +11,17 @@ C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\x86\Release\Voltag
 C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.application
 C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.exe
 C:\Users\jijun\source\repos\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.pdb
+F:\proj\VoltageControl\VoltageControl\bin\x86\Release\VoltageControl.exe.manifest
+F:\proj\VoltageControl\VoltageControl\bin\x86\Release\VoltageControl.application
+F:\proj\VoltageControl\VoltageControl\bin\x86\Release\VoltageControl.exe
+F:\proj\VoltageControl\VoltageControl\bin\x86\Release\VoltageControl.pdb
+F:\proj\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.MainWindow.resources
+F:\proj\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.Properties.Resources.resources
+F:\proj\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.src.AboutBox1.resources
+F:\proj\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.src.MultiSendConfirmDiag.resources
+F:\proj\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.csproj.GenerateResource.Cache
+F:\proj\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.csproj.CoreCompileInputs.cache
+F:\proj\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.exe.manifest
+F:\proj\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.application
+F:\proj\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.exe
+F:\proj\VoltageControl\VoltageControl\obj\x86\Release\VoltageControl.pdb
